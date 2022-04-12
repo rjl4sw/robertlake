@@ -21,11 +21,12 @@ edgeWeightSum = 0
 set
 def extract(raw_edges):
     nodes = int(raw_edges[0][0])
-    p_edges = sorted(truncator(list((x[0],x[1],int(x[2])) for x in raw_edges[nodes+1:])), key=lambda x: x[2])
+    p_edges = (sorted(truncator(list((x[0],x[1],int(x[2])) for x in raw_edges[nodes+1:])), key=lambda x: x[2]))
     disjoint={f:f for f in list(x[0] for x in raw_edges[1:nodes+1])}
     return nodes, p_edges, disjoint
 
 def truncator(edges):
+    index=0
     for e in edges:
         if "p" in e[0] or "p" in  e[1]:
             if "s" in e[0] or "s" in  e[1]:
@@ -35,6 +36,14 @@ def truncator(edges):
                 edges.remove(e)
         elif "d" in e[0] and "d" in e[1]:
             edges.remove(e)
+        elif "s" in e[0] or "s" in e[1]:
+            if "d" in e[0] or "d" in e[1]:
+                if e[1] == edges[index-1][1]:
+                    if e[2] < edges[index-1][2]:
+                        edges[index-1] = e
+                    else:
+                        edges.remove(e)
+        index += 1
     return edges
 
 def find(x):
@@ -67,6 +76,7 @@ def kruskal(data):
             min_span_tree.append((s,d,dist))
             edgeWeightSum += dist
         index += 1
+    print(min_span_tree)
     return edgeWeightSum
 
 class Supply:
@@ -85,5 +95,4 @@ class Supply:
     def compute(self, file_data):
         raw_edges = [tuple(str(i) for i in numbers.split()) for numbers in file_data]
         edgeWeightSum=kruskal(extract(raw_edges))
-
         return edgeWeightSum

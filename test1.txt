@@ -1,17 +1,25 @@
-6 10
+10 14
 p1 port
 rh1 rail-hub
 rh2 rail-hub
 dc1 dist-center
+dc2 dist-center
+dc3 dist-center
+dc4 dist-center
 s1 store
 s2 store
-p1 rh1 5
-p1 rh2 1
+s3 store
+p1 s1 1
 p1 dc1 4
+p1 rh1 2
+p1 dc2 6
 rh1 dc1 1
-rh1 rh2 2
-rh2 dc1 2
-rh2 s1 1
-dc1 s2 1
-dc1 s1 6
-s2 s1 2
+dc1 s1 5
+s1 s3 3
+dc1 s3 2
+dc2 dc1 1
+rh1 rh2 3
+dc2 s2 3
+rh2 s2 1
+rh2 dc3 5
+rh2 dc4 8
