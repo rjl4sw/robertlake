@@ -38,7 +38,7 @@ def truncator(edges):
             edges.remove(e)
         elif "s" in e[0] or "s" in e[1]:
             if "d" in e[0] or "d" in e[1]:
-                if e[1] == edges[index-1][1]:
+                if e[1] == edges[index-1][1] and ("d" in e[0] and "d" in edges[index-1][0]):
                     if e[2] < edges[index-1][2]:
                         edges[index-1] = e
                     else:
