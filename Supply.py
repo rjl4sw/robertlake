@@ -13,15 +13,65 @@
 # considered in breach of this policy. Please refer to the syllabus for a
 # complete description of the collaboration policy.
 #################################
-# Your Computing ID:
+# Your Computing ID: rjl4sw
 # Collaborators:
 # Sources: Introduction to Algorithms, Cormen
 #################################
+edgeWeightSum = 0
+set
+def extract(raw_edges):
+    nodes = int(raw_edges[0][0])
+    p_edges = sorted(truncator(list((x[0],x[1],int(x[2])) for x in raw_edges[nodes+1:])), key=lambda x: x[2])
+    disjoint={f:f for f in list(x[0] for x in raw_edges[1:nodes+1])}
+    return nodes, p_edges, disjoint
+
+def truncator(edges):
+    for e in edges:
+        if "p" in e[0] or "p" in  e[1]:
+            if "s" in e[0] or "s" in  e[1]:
+                edges.remove(e)
+        elif "r" in e[0] or "r" in  e[1]:
+            if "s" in e[0] or "s" in  e[1]:
+                edges.remove(e)
+        elif "d" in e[0] and "d" in e[1]:
+            edges.remove(e)
+    return edges
+
+def find(x):
+    global set
+    if x == set[x]:
+        return x
+    else:
+        return find(set[x])
+
+def union(x,y):
+    global set
+    x = find(x)
+    y = find(y)
+    set[x] = y
+
+def kruskal(data):
+    global edgeWeightSum
+    global set
+    num_nodes=data[0]
+    edges=data[1]
+    set=data[2]
+    index=0
+    min_span_tree = []
+    while len(min_span_tree) < num_nodes-1:
+        (s,d,dist) = edges[index]
+        x = find(s)
+        y = find(d)
+        if x != y:
+            union(x,y)
+            min_span_tree.append((s,d,dist))
+            edgeWeightSum += dist
+        index += 1
+    return edgeWeightSum
 
 class Supply:
     def __init__(self):
         return
-
     # This is the method that should set off the computation
     # of the supply chain problem.  It takes as input a list containing lines of input
     # as strings.  You should parse that input and then call a
@@ -30,9 +80,10 @@ class Supply:
     #
     # @return the total edge-weight sum of a tree that connects nodes as described
     # in the problem statement
-    def compute(self, file_data):
-        edgeWeightSum = 0
 
-        # your function to compute the result should be called here
+
+    def compute(self, file_data):
+        raw_edges = [tuple(str(i) for i in numbers.split()) for numbers in file_data]
+        edgeWeightSum=kruskal(extract(raw_edges))
 
         return edgeWeightSum
