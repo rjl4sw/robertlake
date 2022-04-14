@@ -19,32 +19,64 @@
 #################################
 edgeWeightSum = 0
 set
+dep={}
 def extract(raw_edges):
+    global dep
     nodes = int(raw_edges[0][0])
+    dependencies=[]
+    stores=[]
+    for f in raw_edges[1:nodes+1]:
+        stores.append(f[0])
+        if "d" in f[0]:
+            dependencies.append(f[0])
+    for d in dependencies:
+        dep[d] = []
+    key = ""
+    for r in stores:
+         if "d" in r:
+            key = r
+         if "s" in r:
+            dep[key].append(r)
+    print(dep)
     p_edges = (sorted(truncator(list((x[0],x[1],int(x[2])) for x in raw_edges[nodes+1:])), key=lambda x: x[2]))
     disjoint={f:f for f in list(x[0] for x in raw_edges[1:nodes+1])}
     return nodes, p_edges, disjoint
 
 def truncator(edges):
+    global dep
     index=0
+    print(len(edges))
+    new_edges=edges[:]
     for e in edges:
-        if "p" in e[0] or "p" in  e[1]:
+        if e == ("dc1","s2",1):
+            print("accounted for!")
+        if "p" in e[0] or "p" in e[1]:
+            if "s" in e[0] or "s" in e[1]:
+                new_edges.remove(e)
+        if "r" in e[0] or "r" in  e[1]:
             if "s" in e[0] or "s" in  e[1]:
-                edges.remove(e)
-        elif "r" in e[0] or "r" in  e[1]:
-            if "s" in e[0] or "s" in  e[1]:
-                edges.remove(e)
-        elif "d" in e[0] and "d" in e[1]:
-            edges.remove(e)
-        elif "s" in e[0] or "s" in e[1]:
-            if "d" in e[0] or "d" in e[1]:
-                if e[1] == edges[index-1][1] and ("d" in e[0] and "d" in edges[index-1][0]):
-                    if e[2] < edges[index-1][2]:
-                        edges[index-1] = e
-                    else:
-                        edges.remove(e)
+                new_edges.remove(e)
+        if "d" in e[0] and "d" in e[1]:
+            new_edges.remove(e)
+        if "d" in e[0] and "s" in e[1]:
+            if e[1] in dep[e[0]]:
+                print("keeping")
+                print(e)
+            else:
+                print("deleting")
+                print(e)
+                new_edges.remove(e)
+        "This stops ports from being able to reach other ports"
+        # elif "p" in e[0] and "p" in e[1]:
+        #     edges.remove(e)
+        #elif "s" in e[0] or "s" in e[1]:
+        #    if "d" in e[0] or "d" in e[1]:
+        #        if e[1] == edges[index-1][1] and ("d" in e[0] and "d" in edges[index-1][0]):
+        #            if e[2] < edges[index-1][2]:
+        #            else:
+        #                edges.remove(e)
         index += 1
-    return edges
+    return new_edges
 
 def find(x):
     global set
