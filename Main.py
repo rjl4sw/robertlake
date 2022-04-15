@@ -2,7 +2,7 @@ import sys
 import time
 from Supply import Supply
 
-fp = open("test4.txt", 'r')
+fp = open("test1.txt", 'r')
 lines = fp.readlines()
 inputLines = []
 for line in lines:

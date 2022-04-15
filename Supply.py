@@ -25,6 +25,7 @@ def extract(raw_edges):
     nodes = int(raw_edges[0][0])
     dependencies=[]
     stores=[]
+    print(nodes)
     for f in raw_edges[1:nodes+1]:
         stores.append(f[0])
         if "d" in f[0]:
@@ -37,46 +38,46 @@ def extract(raw_edges):
             key = r
          if "s" in r:
             dep[key].append(r)
-    print(dep)
-    p_edges = (sorted(truncator(list((x[0],x[1],int(x[2])) for x in raw_edges[nodes+1:])), key=lambda x: x[2]))
+    p_edges = sorted(list((x[0],x[1],int(x[2])) for x in raw_edges[nodes+1:]), key=lambda x: x[2])
+    print(p_edges)
+    new_edges=[]
+    for p in p_edges:
+        if (truncator(p))==None:
+            pass
+        else:
+            new_edges.append(p)
     disjoint={f:f for f in list(x[0] for x in raw_edges[1:nodes+1])}
-    return nodes, p_edges, disjoint
+    return nodes, new_edges, disjoint
 
-def truncator(edges):
-    global dep
-    index=0
-    print(len(edges))
-    new_edges=edges[:]
-    for e in edges:
-        if e == ("dc1","s2",1):
-            print("accounted for!")
-        if "p" in e[0] or "p" in e[1]:
-            if "s" in e[0] or "s" in e[1]:
-                new_edges.remove(e)
-        if "r" in e[0] or "r" in  e[1]:
-            if "s" in e[0] or "s" in  e[1]:
-                new_edges.remove(e)
-        if "d" in e[0] and "d" in e[1]:
-            new_edges.remove(e)
-        if "d" in e[0] and "s" in e[1]:
-            if e[1] in dep[e[0]]:
-                print("keeping")
-                print(e)
-            else:
-                print("deleting")
-                print(e)
-                new_edges.remove(e)
-        "This stops ports from being able to reach other ports"
-        # elif "p" in e[0] and "p" in e[1]:
-        #     edges.remove(e)
-        #elif "s" in e[0] or "s" in e[1]:
-        #    if "d" in e[0] or "d" in e[1]:
-        #        if e[1] == edges[index-1][1] and ("d" in e[0] and "d" in edges[index-1][0]):
-        #            if e[2] < edges[index-1][2]:
-        #            else:
-        #                edges.remove(e)
-        index += 1
-    return new_edges
+def truncator(e):
+    if e[2] == 0:
+       return None
+
+    if "p" in e[0][0] or "p" in e[1][0]:
+        if "s" in e[0][0] or "s" in e[1][0]:
+            return None
+    if "r" in e[0][0] or "r" in  e[1][0]:
+         if "s" in e[0][0] or "s" in  e[1][0]:
+             return None
+    if "d" in e[0][0] and "d" in e[1][0]:
+        return None
+    if ("d" in e[1][0] and "s" in e[0][0]):
+        return None
+    if ("d" in e[0][0] and "s" in e[1][0]) :
+        if e[1] in dep[e[0]]or "s1d" in e[1]:
+            return e
+        else:
+            return None
+    "This stops ports from being able to reach other ports"
+    # elif "p" in e[0] and "p" in e[1]:
+    #     edges.remove(e)
+    #elif "s" in e[0] or "s" in e[1]:
+    #    if "d" in e[0] or "d" in e[1]:
+    #        if e[1] == edges[index-1][1] and ("d" in e[0] and "d" in edges[index-1][0]):
+    #            if e[2] < edges[index-1][2]:
+    #            else:
+    #                edges.remove(e)
+    return e
 
 def find(x):
     global set
@@ -96,6 +97,7 @@ def kruskal(data):
     global set
     num_nodes=data[0]
     edges=data[1]
+    print(edges)
     set=data[2]
     index=0
     min_span_tree = []
@@ -125,6 +127,11 @@ class Supply:
 
 
     def compute(self, file_data):
-        raw_edges = [tuple(str(i) for i in numbers.split()) for numbers in file_data]
+        raw_edges = [tuple(str(i) for i in numbers.split()) for numbers in file_data ]
+        for r in reversed(raw_edges):
+            if len(r)<2:
+                raw_edges.remove(r)
+            else:
+                break
         edgeWeightSum=kruskal(extract(raw_edges))
         return edgeWeightSum
